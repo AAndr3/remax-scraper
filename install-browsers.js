@@ -1,11 +1,10 @@
-// install-browsers.js
-const { installBrowsersForNpmInstall } = require('@playwright/test/lib/install/installer');
+const { execSync } = require('child_process');
 
-installBrowsersForNpmInstall()
-  .then(() => {
-    console.log('✅ Browsers Playwright instalados com sucesso!');
-  })
-  .catch((err) => {
-    console.error('❌ Erro ao instalar browsers Playwright:', err);
-    process.exit(1);
-  });
+try {
+  console.log('⏳ A instalar browsers do Playwright...');
+  execSync('npx playwright install chromium', { stdio: 'inherit' });
+  console.log('✅ Chromium instalado com sucesso!');
+} catch (err) {
+  console.error('❌ Erro ao instalar browsers do Playwright:', err);
+  process.exit(1);
+}
