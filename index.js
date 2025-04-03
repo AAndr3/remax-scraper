@@ -1,5 +1,5 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const { chromium } = require('playwright');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,14 +12,13 @@ app.get('/scrape', async (req, res) => {
   const url = `https://remax.pt/pt/comprar/imoveis/habitacao/coimbra/${encodedCidade}/r/t?s={"rg":"${cidade}"}&p=${pagina}&o=-PublishDate`;
 
   try {
-    const browser = await puppeteer.launch({
+    const browser = await chromium.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
-      // NÃO usamos executablePath — deixamos o Puppeteer usar o Chromium embutido
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
     const data = await page.evaluate(() => {
       const items = Array.from(document.querySelectorAll('.propertyCard'));
@@ -34,7 +33,7 @@ app.get('/scrape', async (req, res) => {
     await browser.close();
     res.json(data);
   } catch (err) {
-    console.error('Erro no scraping:', err.message);
+    console.error('Erro no scraping:', err);
     res.status(500).json({ error: 'Erro no scraping' });
   }
 });
