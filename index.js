@@ -13,8 +13,9 @@ app.get('/scrape', async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
+      // NÃO usamos executablePath — deixamos o Puppeteer usar o Chromium embutido
     });
 
     const page = await browser.newPage();
@@ -33,7 +34,7 @@ app.get('/scrape', async (req, res) => {
     await browser.close();
     res.json(data);
   } catch (err) {
-    console.error(err);
+    console.error('Erro no scraping:', err.message);
     res.status(500).json({ error: 'Erro no scraping' });
   }
 });
